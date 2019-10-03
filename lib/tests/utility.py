@@ -1,3 +1,4 @@
+
 import os
 import sys
 import json
@@ -59,102 +60,64 @@ def is_valid_string(string_value):
 def remove_newline(string_value):
         return string_value.rstrip()
 
-#MSTRPath = '/opt/mstr/MicroStrategy'
-MSTRPath = 'C:\\Program Files (x86)\\Common Files\\MicroStrategy\\'
-server_name = 'env-165137laiouse1'
-user_name = 'Administrator'
-user_pwd = 'X9pUk9iVsdyu'
-port = '34952'
+def compare_arrays(base_array, base_info, new_array, new_info):
+    result = []
+    row = 0
+    elementdic = {}
 
-create_project_source(MSTRPath,server_name,port,user_name,user_pwd)
+    elementdic['sn1'] = base_info('sn')
+    elementdic['sn2'] = new_info('sn')
+    elementdic['pr1'] = base_info('pr')
+    elementdic['pr2'] = new_info('pr')
+    elementdic['source'] = base_info('sr')
+    elementdic['usr1'] = base_info('usr')
+    elementdic['usr2'] = new_info('usr')
 
+    base_array_copy = base_array
 
-command = "LIST ALL PROPERTIES FOR SERVER CONFIGURATION;"
-validation_str = ["Task(s) execution completed successfully."]
-cmdexecutor = cmdmgrExecutor(MSTRPath, server_name, user_name, user_pwd)
-execution = cmdexecutor.run_validation(command, validation_str)
-print "this is the execution"
-#print execution
+    for element in new_array:
 
-for n in execution[1]:
-    if is_valid_string(n):
-         print remove_newline(n)
-if not execution[0]:
-        raise Exception('Error on executing ' + command)
+        found = False
+        row = row + 1
+        elementdic['row'] = row
 
-def rf_cmmgr(MSTRPath, server_name, user_name, user_pwd, port, project, source):
-    MSTRPath=MSTRPath
-    server_name=server_name
-    user_name=user_name
-    user_pwd=user_pwd
-    port=port
-    project=project
-    source=source
-    command = ''
-    if source=='Project':
-        command = 'LIST ALL PROPERTIES FOR PROJECT CONFIGURATION IN PROJECT "' + project + '";'
-    else:
-        command = 'LIST ALL PROPERTIES FOR SERVER CONFIGURATION;'
-    validation_str = ['Task(s) execution completed successfully.']
-    cmdexecutor = cmdmgrExecutor(MSTRPath, server_name, user_name, user_pwd)
-    execution = cmdexecutor.run_validation(command, validation_str)
-    if not execution[0]:
-        raise Exception('Error on executing ' + command)
-    format_output=[]
-    setting_id=1
-    parent1=''
-    parent2=''
-    for raw in execution[1]:
-        row = {}
-        raw=raw.replace('\n','')
-        if '\t' in raw:
-            row['level']=raw.count('\t')
-        else:
-            row['level']=0
-        raw=raw.replace('\t','')
-        row['setting_id']=setting_id
-        if ' = ' in raw:
-            row['type']='value'
-            setting=raw.split(' = ')
-            row['name']=setting[0]
-            row['value']=setting[1]
-        else:
-            row['type']='parent'
-            row['name']=raw
-            row['value']=''
-        row['source']=source
-        row['setting_id']=setting_id
-        setting_id=setting_id+1
-        if row['level']==0 and row['type']=='parent':
-            parent1=row['name']
-        if row['level']==1 and row['type']=='parent':
-            parent2=row['name']
-        if row['level']==0 and row['type']=='value':
-            row['parent1']=''
-            row['parent2']=''
-        elif row['level']==1 and row['type']=='value':
-            row['parent1']=parent1
-            row['parent2']=''
-        else:
-            row['parent1']=parent1
-            row['parent2']=parent2
-        if row['level']==2:
-            row['location']=row['parent1']+' > '+row['parent2']+' > '+row['name']
-            #row['rawkey']=row['parent1']+' > '+row['parent2']+' > '+row['name'] + ' = ' + row['value']
-            row['rawkey']=row['parent1']+' > '+row['parent2']+' > '+row['name']
-        elif row['level']==1:
-            row['location']=row['parent1']+' > '+row['name']
-            #row['rawkey']=row['parent1']+' > '+row['name'] + ' = ' + row['value']
-            row['rawkey']=row['parent1']+' > '+row['name']
-        else:
-            row['location']=row['name']
-            #row['rawkey']=row['name'] + ' = ' + row['value']
-            row['rawkey']=row['name']
-        hashedkey=hashlib.md5(row['rawkey'].encode())
-        row['hashkey']=hashedkey.hexdigest()
-        row['sn']=server_name
-        row['pr']=project
-        row['usr']=user_name
-        if row['type']=='value':
-            format_output.append(row)
-    return format_output
+        elementdic['setname'] = element['name']
+        elementdic['setlevel'] = element['level']
+        elementdic['parent1'] = element['parent1']
+        elementdic['parent2'] = element['parent2']
+        elementdic['val2'] = element['value']
+
+        for target in base_array_copy:
+            if element['hashkey'] = target['hashkey']:
+                found = True
+                elementdic['val1'] = target['value']
+                if element['value'] = target['value']:
+                    elementdic['diff'] = 0
+                else:
+                    elementdic['diff'] = 1
+                
+                base_array_copy.remove(target)
+                break
+        
+        if not found :
+            elementdic['val1'] =''
+            elementdic['diff'] = 1
+        
+        result.append(elementdic)
+    
+    for element in base_array_copy:
+        row = row + 1
+        elementdic['row'] = row
+
+        elementdic['setname'] = element['name']
+        elementdic['setlevel'] = element['level']
+        elementdic['parent1'] = element['parent1']
+        elementdic['parent2'] = element['parent2']
+
+        elementdic['val1'] = element['value']
+        elementdic['val2'] = ''
+        elementdic['diff'] = 1
+
+        result.append(elementdic)
+    
+    return result

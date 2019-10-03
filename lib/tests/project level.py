@@ -51,18 +51,44 @@ server_name = 'env-165136laiouse1'
 user_name = 'Administrator'
 user_pwd = 'mYJ80QKa2hbu'
 port = '34952'
-
+project = 'MicroStrategy Tutorial'
 create_project_source(MSTRPath,server_name,port,user_name,user_pwd)
 
 
-command = "LIST ALL PROPERTIES FOR SERVER CONFIGURATION;"
+command = "LIST ALL PROPERTIES FOR PROJECT CONFIGURATION IN PROJECT '"+project+"';"
 validation_str = ["Task(s) execution completed successfully."]
 cmdexecutor = cmdmgrExecutor(MSTRPath, server_name, user_name, user_pwd)
 execution = cmdexecutor.run_validation(command, validation_str)
+'''
 print "this is the execution"
-#print execution
-
-for n in execution[1]:
-        print n
 if not execution[0]:
         raise Exception('Error on executing ' + command)
+'''
+
+format_output={}
+row_number=1
+source='Project'
+for raw in execution[1]:
+    #print raw
+    raw=raw.replace('\n','')
+    row = {}
+    row['row_number']=row_number
+    if '=' in raw:
+        row['type']='value'
+        setting=raw.split(' = ')
+        row['name']=setting[0]
+        row['value']=setting[1]
+    else:
+        row['type']='parent'
+        row['name']=raw
+        row['value']=''
+    
+
+    row['row_number']=row_number
+    row_number=row_number+1
+    print row
+    format_output.update(row)
+
+#print format_output
+
+

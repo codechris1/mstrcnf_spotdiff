@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import hashlib
 from cmdmgr_executor import Executor as cmdmgrExecutor
 from cfgwiz_executor import Executor as cfgwizExecutor
 
@@ -80,3 +81,80 @@ for n in execution[1]:
          print remove_newline(n)
 if not execution[0]:
         raise Exception('Error on executing ' + command)
+
+def rf_cmmgr(MSTRPath, server_name, user_name, user_pwd, port, project, source):
+    MSTRPath=MSTRPath
+    server_name=server_name
+    user_name=user_name
+    user_pwd=user_pwd
+    port=port
+    project=project
+    source=source
+    command = ''
+    if source=='Project':
+        command = 'LIST ALL PROPERTIES FOR PROJECT CONFIGURATION IN PROJECT "' + project + '";'
+    else:
+        command = 'LIST ALL PROPERTIES FOR SERVER CONFIGURATION;'
+    validation_str = ['Task(s) execution completed successfully.']
+    cmdexecutor = cmdmgrExecutor(MSTRPath, server_name, user_name, user_pwd)
+    execution = cmdexecutor.run_validation(command, validation_str)
+    if not execution[0]:
+        raise Exception('Error on executing ' + command)
+    format_output=[]
+    setting_id=1
+    parent1=''
+    parent2=''
+    for raw in execution[1]:
+        row = {}
+        raw=raw.replace('\n','')
+        if '\t' in raw:
+            row['level']=raw.count('\t')
+        else:
+            row['level']=0
+        raw=raw.replace('\t','')
+        row['setting_id']=setting_id
+        if ' = ' in raw:
+            row['type']='value'
+            setting=raw.split(' = ')
+            row['name']=setting[0]
+            row['value']=setting[1]
+        else:
+            row['type']='parent'
+            row['name']=raw
+            row['value']=''
+        row['source']=source
+        row['setting_id']=setting_id
+        setting_id=setting_id+1
+        if row['level']==0 and row['type']=='parent':
+            parent1=row['name']
+        if row['level']==1 and row['type']=='parent':
+            parent2=row['name']
+        if row['level']==0 and row['type']=='value':
+            row['parent1']=''
+            row['parent2']=''
+        elif row['level']==1 and row['type']=='value':
+            row['parent1']=parent1
+            row['parent2']=''
+        else:
+            row['parent1']=parent1
+            row['parent2']=parent2
+        if row['level']==2:
+            row['location']=row['parent1']+' > '+row['parent2']+' > '+row['name']
+            #row['rawkey']=row['parent1']+' > '+row['parent2']+' > '+row['name'] + ' = ' + row['value']
+            row['rawkey']=row['parent1']+' > '+row['parent2']+' > '+row['name']
+        elif row['level']==1:
+            row['location']=row['parent1']+' > '+row['name']
+            #row['rawkey']=row['parent1']+' > '+row['name'] + ' = ' + row['value']
+            row['rawkey']=row['parent1']+' > '+row['name']
+        else:
+            row['location']=row['name']
+            #row['rawkey']=row['name'] + ' = ' + row['value']
+            row['rawkey']=row['name']
+        hashedkey=hashlib.md5(row['rawkey'].encode())
+        row['hashkey']=hashedkey.hexdigest()
+        row['sn']=server_name
+        row['pr']=project
+        row['usr']=user_name
+        if row['type']=='value':
+            format_output.append(row)
+    return format_output

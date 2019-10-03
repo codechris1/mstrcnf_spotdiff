@@ -1,7 +1,6 @@
 import os
 import sys
 import json
-import utility
 from cmdmgr_executor import Executor as cmdmgrExecutor
 from cfgwiz_executor import Executor as cfgwizExecutor
 
@@ -45,11 +44,25 @@ def create_project_source(MSTRPath,server_name,port,user_name,user_pwd):
         script = create_script(server_name, server_name, port, authmethod,user_name,user_pwd ,'DSN')
         executor.run_cfgwiz(script)
 
+def is_valid_string(string_value):
+        if "pm" in string_value:
+            return False
+        if "am" in string_value:
+            return False
+        if "==================================" in string_value:
+            return False
+        if "####################################" in string_value:
+            return False
+        return True
+
+def remove_newline(string_value):
+        return string_value.rstrip()
+
 #MSTRPath = '/opt/mstr/MicroStrategy'
 MSTRPath = 'C:\\Program Files (x86)\\Common Files\\MicroStrategy\\'
-server_name = 'env-165136-tcp.customer.cloud.microstrategy.com'
+server_name = 'env-165137laiouse1'
 user_name = 'Administrator'
-user_pwd = 'mYJ80QKa2hbu'
+user_pwd = 'X9pUk9iVsdyu'
 port = '34952'
 
 create_project_source(MSTRPath,server_name,port,user_name,user_pwd)
@@ -63,7 +76,7 @@ print "this is the execution"
 #print execution
 
 for n in execution[1]:
-    if utility.is_valid_string(n):
-         print utility.remove_newline(n)
+    if is_valid_string(n):
+         print remove_newline(n)
 if not execution[0]:
         raise Exception('Error on executing ' + command)

@@ -1,6 +1,8 @@
 import os
 import sys
 import json
+import hashlib
+from itertools import cycle
 from cmdmgr_executor import Executor as cmdmgrExecutor
 from cfgwiz_executor import Executor as cfgwizExecutor
 
@@ -21,10 +23,10 @@ def create_script(data_source, server_name, port_number, authentication, user_na
     elif auth_lower == 'integrated':
         auth = 128
 
-    script = """[Client]
+    script = '''[Client]
     Client=1
     ConnType=3
-    Timeout=5"""
+    Timeout=5'''
     script += '\nDataSource=' + data_source
     script += '\nServerName=' + server_name
     script += '\nPort=' + port_number
@@ -55,25 +57,38 @@ project = 'MicroStrategy Tutorial'
 create_project_source(MSTRPath,server_name,port,user_name,user_pwd)
 
 
-command = "LIST ALL PROPERTIES FOR PROJECT CONFIGURATION IN PROJECT '"+project+"';"
-validation_str = ["Task(s) execution completed successfully."]
+command = 'LIST ALL PROPERTIES FOR PROJECT CONFIGURATION IN PROJECT "'+project+'";'
+#command = 'LIST ALL PROPERTIES FOR SERVER CONFIGURATION;'
+validation_str = ['Task(s) execution completed successfully.']
 cmdexecutor = cmdmgrExecutor(MSTRPath, server_name, user_name, user_pwd)
 execution = cmdexecutor.run_validation(command, validation_str)
 '''
-print "this is the execution"
+print 'this is the execution'
 if not execution[0]:
         raise Exception('Error on executing ' + command)
 '''
 
-format_output={}
-row_number=1
+format_output=[]
+setting_id=1
 source='Project'
+running = True
+#licycle = cycle(execution[1])
+#nextraw = next(licycle)
+parent1=''
+parent2=''
 for raw in execution[1]:
+#while running:
+    #raw, nextraw = nextraw, next(licycle)
     #print raw
-    raw=raw.replace('\n','')
     row = {}
-    row['row_number']=row_number
-    if '=' in raw:
+    raw=raw.replace('\n','')
+    if '\t' in raw:
+        row['level']=raw.count('\t')
+    else:
+        row['level']=0
+    raw=raw.replace('\t','')
+    row['setting_id']=setting_id
+    if ' = ' in raw:
         row['type']='value'
         setting=raw.split(' = ')
         row['name']=setting[0]
@@ -82,13 +97,40 @@ for raw in execution[1]:
         row['type']='parent'
         row['name']=raw
         row['value']=''
-    
+    row['source']=source
+    row['setting_id']=setting_id
+    setting_id=setting_id+1
+    if row['level']==0 and row['type']=='parent':
+        parent1=row['name']
+    if row['level']==1 and row['type']=='parent':
+        parent2=row['name']
+    if row['level']==0 and row['type']=='value':
+        row['parent1']=''
+        row['parent2']=''
+    elif row['level']==1 and row['type']=='value':
+        row['parent1']=parent1
+        row['parent2']=''
+    else:
+        row['parent1']=parent1
+        row['parent2']=parent2
+    if row['level']==2:
+        row['location']=row['parent1']+' > '+row['parent2']+' > '+row['name']
+        row['rawkey']=row['parent1']+' > '+row['parent2']+' > '+row['name'] + ' = ' + row['value']
+    elif row['level']==1:
+        row['location']=row['parent1']+' > '+row['name']
+        row['rawkey']=row['parent1']+' > '+row['name'] + ' = ' + row['value']
+    else:
+        row['location']=row['name']
+        row['rawkey']=row['name'] + ' = ' + row['value']
+    hashedkey=hashlib.md5(row['rawkey'].encode())
+    row['hashkey']=hashedkey.hexdigest()
+    if row['type']=='value':
+        format_output.append(row)
+    #print row
 
-    row['row_number']=row_number
-    row_number=row_number+1
-    print row
-    format_output.update(row)
+#print '\nThe json starts here\n'
 
-#print format_output
 
+#with open('test.json','w+') as jsonfile:
+#    json.dump(format_output,jsonfile)
 

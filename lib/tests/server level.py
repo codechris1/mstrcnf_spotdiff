@@ -52,18 +52,34 @@ user_name = 'Administrator'
 user_pwd = 'mYJ80QKa2hbu'
 port = '34952'
 
+MSTRPathB = 'C:\\Program Files (x86)\\Common Files\\MicroStrategy\\'
+server_nameB = 'env-165137-tcp.customer.cloud.microstrategy.com'
+user_nameB = 'Administrator'
+user_pwdB = 'X9pUk9iVsdyu'
+portB = '34952'
+
 create_project_source(MSTRPath,server_name,port,user_name,user_pwd)
+create_project_source(MSTRPathB,server_nameB,portB,user_nameB,user_pwdB)
 
 
-command = "LIST ALL PROPERTIES FOR SERVER CONFIGURATION;"
-validation_str = ["Task(s) execution completed successfully."]
-cmdexecutor = cmdmgrExecutor(MSTRPath, server_name, user_name, user_pwd)
-execution = cmdexecutor.run_validation(command, validation_str)
-print "this is the execution"
-#print execution
 
-for n in execution[1]:
-    if utility.is_valid_string(n):
-         print utility.remove_newline(n)
-if not execution[0]:
-        raise Exception('Error on executing ' + command)
+
+server_output = utility.rf_cmmgr(MSTRPath,server_name, user_name, user_pwd, port, '', 'Server')
+server_info = {
+    'sn' :'serverA',
+    'pr' :  '',
+    'usr' : 'test',
+    'sr' : 'Server'
+}
+
+server_outputB = utility.rf_cmmgr(MSTRPathB,server_nameB, user_nameB, user_pwdB, portB, '', 'Server')
+server_infoB = {
+    'sn' :'serverB',
+    'pr' :  '',
+    'usr' : 'test',
+    'sr' : 'Server'
+}
+
+compare_result = utility.compare_arrays(server_output, server_info, server_outputB, server_infoB)
+with open('test.json','w+') as jsonfile:
+    json.dump(compare_result,jsonfile)

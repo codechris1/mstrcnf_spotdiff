@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import hashlib
+import copy
 from cmdmgr_executor import Executor as cmdmgrExecutor
 from cfgwiz_executor import Executor as cfgwizExecutor
 
@@ -164,18 +165,17 @@ def compare_arrays(base_array, base_info, new_array, new_info):
     row = 0
     elementdic = {}
 
-    elementdic['sn1'] = base_info('sn')
-    elementdic['sn2'] = new_info('sn')
-    elementdic['pr1'] = base_info('pr')
-    elementdic['pr2'] = new_info('pr')
-    elementdic['source'] = base_info('sr')
-    elementdic['usr1'] = base_info('usr')
-    elementdic['usr2'] = new_info('usr')
+    elementdic['sn1'] = base_info['sn']
+    elementdic['sn2'] = new_info['sn']
+    elementdic['pr1'] = base_info['pr']
+    elementdic['pr2'] = new_info['pr']
+    elementdic['source'] = base_info['sr']
+    elementdic['usr1'] = base_info['usr']
+    elementdic['usr2'] = new_info['usr']
 
-    base_array_copy = base_array
+    base_array_copy = copy.copy(base_array)
 
     for element in new_array:
-
         found = False
         row = row + 1
         elementdic['row'] = row
@@ -187,10 +187,10 @@ def compare_arrays(base_array, base_info, new_array, new_info):
         elementdic['val2'] = element['value']
 
         for target in base_array_copy:
-            if element['hashkey'] = target['hashkey']:
+            if element['hashkey'] == target['hashkey']:
                 found = True
                 elementdic['val1'] = target['value']
-                if element['value'] = target['value']:
+                if element['value'] == target['value']:
                     elementdic['diff'] = 0
                 else:
                     elementdic['diff'] = 1
@@ -202,7 +202,7 @@ def compare_arrays(base_array, base_info, new_array, new_info):
             elementdic['val1'] =''
             elementdic['diff'] = 1
         
-        result.append(elementdic)
+        result.append(copy.copy(elementdic))
     
     for element in base_array_copy:
         row = row + 1
@@ -217,6 +217,7 @@ def compare_arrays(base_array, base_info, new_array, new_info):
         elementdic['val2'] = ''
         elementdic['diff'] = 1
 
-        result.append(elementdic)
+        result.append(copy.copy(elementdic))
+        
     
     return result

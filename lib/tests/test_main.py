@@ -18,7 +18,7 @@ def pick_config():
             list_files[fnumber]=filename
             fnumber=fnumber+1
     if len(list_files) > 0:
-        print('The following configuration files where found: ')
+        print('The following configuration files were found: ')
         for f in list_files:
             print(str(f) + ' : ' + list_files[f])
         try:

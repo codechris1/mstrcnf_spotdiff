@@ -3,6 +3,7 @@ import sys
 import json
 import hashlib
 import copy
+from collections import OrderedDict
 from cmdmgr_executor import Executor as cmdmgrExecutor
 from cfgwiz_executor import Executor as cfgwizExecutor
 
@@ -59,29 +60,6 @@ def is_valid_string(string_value):
 
 def remove_newline(string_value):
         return string_value.rstrip()
-
-#MSTRPath = '/opt/mstr/MicroStrategy'
-MSTRPath = 'C:\\Program Files (x86)\\Common Files\\MicroStrategy\\'
-server_name = 'env-165137laiouse1'
-user_name = 'Administrator'
-user_pwd = 'X9pUk9iVsdyu'
-port = '34952'
-
-create_project_source(MSTRPath,server_name,port,user_name,user_pwd)
-
-
-command = "LIST ALL PROPERTIES FOR SERVER CONFIGURATION;"
-validation_str = ["Task(s) execution completed successfully."]
-cmdexecutor = cmdmgrExecutor(MSTRPath, server_name, user_name, user_pwd)
-execution = cmdexecutor.run_validation(command, validation_str)
-print "this is the execution"
-#print execution
-
-for n in execution[1]:
-    if is_valid_string(n):
-         print remove_newline(n)
-if not execution[0]:
-        raise Exception('Error on executing ' + command)
 
 def rf_cmmgr(MSTRPath, server_name, user_name, user_pwd, port, project, source):
     MSTRPath=MSTRPath
@@ -218,6 +196,26 @@ def compare_arrays(base_array, base_info, new_array, new_info):
         elementdic['diff'] = 1
 
         result.append(copy.copy(elementdic))
-        
-    
+
     return result
+
+def input_parameters():
+    args={}
+    input_texts=OrderedDict(
+        [
+            ("path","Provide the Path Location: "),
+            ("server1", "Provide the Hostname for Server 1 : "),
+            ("user1", "Provide the User for Server 1 : "),
+            ("password1", "Provide the Password for Server 1 : "),
+            ("port1", "Provide the Port for Server 1 : "),
+            ("project1", "Provide the Project for Server 1 : "),
+            ("server2", "Provide the Hostname for Server 2 : "),
+            ("user2", "Provide the User for Server 2 : "),
+            ("password2", "Provide the Password for Server 2 : "),
+            ("port2", "Provide the Port for Server 2 : "),
+            ("project2", "Provide the Project for Server 2 : ")
+        ]
+    )
+    for element in input_texts:
+        args[element]=raw_input(input_texts[element])
+    return args

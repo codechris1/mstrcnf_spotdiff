@@ -85,10 +85,14 @@ def rf_cmmgr(MSTRPath, server_name, user_name, user_pwd, port, project, source):
     parent1=''
     parent2=''
     for raw in execution[1]:
+        if raw.startswith('<') or raw.startswith('src=\"'):
+            continue
         row = {}
         raw=raw.replace('\n','')
-        if '\t' in raw:
-            row[SettingAttr.LEVEL]=raw.count('\t')
+        if raw.startswith('\t\t'):
+            row[SettingAttr.LEVEL]=2
+        elif raw.startswith('\t'):
+            row[SettingAttr.LEVEL]=1
         else:
             row[SettingAttr.LEVEL]=0
         raw=raw.replace('\t','')
@@ -102,6 +106,7 @@ def rf_cmmgr(MSTRPath, server_name, user_name, user_pwd, port, project, source):
             row[SettingAttr.TYPE]='parent'
             row[SettingAttr.NAME]=raw
             row[SettingAttr.VALUE]=''
+
         row[SettingAttr.SOURCE]=source
         row[SettingAttr.ID]=setting_id
         setting_id=setting_id+1
@@ -135,7 +140,7 @@ def rf_cmmgr(MSTRPath, server_name, user_name, user_pwd, port, project, source):
         #row['sn']=server_name
         #row['pr']=project
         #row['usr']=user_name
-        if row[SettingAttr.TYPE]=='value':
+        if row[SettingAttr.TYPE] == 'value':
             format_output.append(row)
     return format_output
 

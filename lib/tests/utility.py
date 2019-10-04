@@ -203,19 +203,23 @@ def input_parameters():
     args={}
     input_texts=OrderedDict(
         [
-            ("path","Provide the Path Location: "),
+            ("path","Provide the Path where MicroStrategy is installed (Usually C:\\Program Files (x86)\\Common Files\\MicroStrategy\\) : "),
             ("server1", "Provide the Hostname for Server 1 : "),
             ("user1", "Provide the User for Server 1 : "),
             ("password1", "Provide the Password for Server 1 : "),
-            ("port1", "Provide the Port for Server 1 : "),
+            ("port1", "Provide the Port for Server 1 (Usually 34952) : "),
             ("project1", "Provide the Project for Server 1 : "),
             ("server2", "Provide the Hostname for Server 2 : "),
             ("user2", "Provide the User for Server 2 : "),
             ("password2", "Provide the Password for Server 2 : "),
-            ("port2", "Provide the Port for Server 2 : "),
+            ("port2", "Provide the Port for Server 2 (Usually 34952) : "),
             ("project2", "Provide the Project for Server 2 : ")
         ]
     )
     for element in input_texts:
         args[element]=raw_input(input_texts[element])
+        if element=="path" and args[element] == "":
+            args[element] = 'C:\\Program Files (x86)\\Common Files\\MicroStrategy\\'
+        elif (element=="port1" or element=="port2") and args[element] == "":
+            args[element] = "34952"
     return args

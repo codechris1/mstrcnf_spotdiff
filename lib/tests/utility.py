@@ -158,3 +158,65 @@ def rf_cmmgr(MSTRPath, server_name, user_name, user_pwd, port, project, source):
         if row['type']=='value':
             format_output.append(row)
     return format_output
+
+def compare_arrays(base_array, base_info, new_array, new_info):
+    result = []
+    row = 0
+    elementdic = {}
+
+    elementdic['sn1'] = base_info('sn')
+    elementdic['sn2'] = new_info('sn')
+    elementdic['pr1'] = base_info('pr')
+    elementdic['pr2'] = new_info('pr')
+    elementdic['source'] = base_info('sr')
+    elementdic['usr1'] = base_info('usr')
+    elementdic['usr2'] = new_info('usr')
+
+    base_array_copy = base_array
+
+    for element in new_array:
+
+        found = False
+        row = row + 1
+        elementdic['row'] = row
+
+        elementdic['setname'] = element['name']
+        elementdic['setlevel'] = element['level']
+        elementdic['parent1'] = element['parent1']
+        elementdic['parent2'] = element['parent2']
+        elementdic['val2'] = element['value']
+
+        for target in base_array_copy:
+            if element['hashkey'] = target['hashkey']:
+                found = True
+                elementdic['val1'] = target['value']
+                if element['value'] = target['value']:
+                    elementdic['diff'] = 0
+                else:
+                    elementdic['diff'] = 1
+                
+                base_array_copy.remove(target)
+                break
+        
+        if not found :
+            elementdic['val1'] =''
+            elementdic['diff'] = 1
+        
+        result.append(elementdic)
+    
+    for element in base_array_copy:
+        row = row + 1
+        elementdic['row'] = row
+
+        elementdic['setname'] = element['name']
+        elementdic['setlevel'] = element['level']
+        elementdic['parent1'] = element['parent1']
+        elementdic['parent2'] = element['parent2']
+
+        elementdic['val1'] = element['value']
+        elementdic['val2'] = ''
+        elementdic['diff'] = 1
+
+        result.append(elementdic)
+    
+    return result

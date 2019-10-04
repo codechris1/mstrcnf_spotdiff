@@ -158,7 +158,6 @@ def compare_arrays(base_array, base_info, new_array, new_info):
         found = False
         row = row + 1
         elementdic[SettingDSAttr.ROWID.value] = row
-        elementdic[SettingDSAttr.LOCATION.value] = element[SettingAttr.LOCATION]
 
         elementdic[SettingDSAttr.NAME.value] = element[SettingAttr.NAME]
         elementdic[SettingDSAttr.LEVEL.value] = element[SettingAttr.LEVEL]
@@ -187,7 +186,6 @@ def compare_arrays(base_array, base_info, new_array, new_info):
     for element in base_array_copy:
         row = row + 1
         elementdic[SettingDSAttr.ROWID.value] = row
-        elementdic[SettingDSAttr.LOCATION.value] = element[SettingAttr.LOCATION]
 
         elementdic[SettingDSAttr.NAME.value] = element[SettingAttr.NAME]
         elementdic[SettingDSAttr.LEVEL.value] = element[SettingAttr.LEVEL]
@@ -237,6 +235,7 @@ def pick_config():
     args={}
     picked=0
     filename_picked=''
+    #print('The following configuration files where found :')
     for root, dirs, files in os.walk("conf\\"):
         for filename in files:
             list_files[fnumber]=filename
@@ -251,15 +250,11 @@ def pick_config():
                 args=json.load(fparams)
             filename_picked=list_files[picked]
         except:
-            args = input_parameters()
+            args = utility.input_parameters()
             filename_picked = raw_input('Type a name for your new configuration: ') 
             save_config(args,filename_picked)
     else:
-        args = input_parameters()
+        args = utility.input_parameters()
         filename_picked = raw_input('Type a name for your new configuration: ') 
         save_config(args,filename_picked)
     return filename_picked,args
-
-def save_results(args,config_name):
-    with open('results\\' + config_name + '.json','w+') as jsonfile:
-        json.dump(args, jsonfile, indent=4, separators=(',', ': '), sort_keys=True)

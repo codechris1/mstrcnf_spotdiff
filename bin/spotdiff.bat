@@ -1,1 +1,4 @@
-python ..\lib\main.py
+@echo off
+pushd "%~dp0"
+cd ..
+python lib\main.py

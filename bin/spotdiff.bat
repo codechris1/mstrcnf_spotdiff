@@ -1,0 +1,1 @@
+python ..\lib\main.py

@@ -11,6 +11,7 @@ def pick_config():
     fnumber=1
     args={}
     picked=0
+    filename_picked=''
     #print('The following configuration files where found :')
     for root, dirs, files in os.walk("conf\\"):
         for filename in files:
@@ -20,18 +21,21 @@ def pick_config():
         print('The following configuration files where found: ')
         for f in list_files:
             print(str(f) + ' : ' + list_files[f])
-        picked=int(raw_input('Select a file by typing the index : '))
-        with open("conf\\"+list_files[picked]) as fparams:
-            args=json.load(fparams)
-        return list_files[picked],args,True
-    return '',args,False
-'''
-args = utility.input_parameters()
-print args
-save_config(args,'test1')
-save_config(args,'test2')
-save_config(args,'test3')
-'''
+        try:
+            picked=int(raw_input('Select a file by typing the index (If you wish to create a new configuration, hit enter): '))
+            with open("conf\\"+list_files[picked]) as fparams:
+                args=json.load(fparams)
+            filename_picked=list_files[picked]
+        except:
+            args = utility.input_parameters()
+            filename_picked = raw_input('Type a name for your new configuration: ') 
+            save_config(args,filename_picked)
+    else:
+        args = utility.input_parameters()
+        filename_picked = raw_input('Type a name for your new configuration: ') 
+        save_config(args,filename_picked)
+    return filename_picked,args
+
 args = pick_config()
 print args
 #print args[1]

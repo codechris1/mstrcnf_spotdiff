@@ -237,7 +237,6 @@ def pick_config():
     args={}
     picked=0
     filename_picked=''
-    #print('The following configuration files where found :')
     for root, dirs, files in os.walk("conf\\"):
         for filename in files:
             list_files[fnumber]=filename
@@ -252,11 +251,15 @@ def pick_config():
                 args=json.load(fparams)
             filename_picked=list_files[picked]
         except:
-            args = utility.input_parameters()
+            args = input_parameters()
             filename_picked = raw_input('Type a name for your new configuration: ') 
             save_config(args,filename_picked)
     else:
-        args = utility.input_parameters()
+        args = input_parameters()
         filename_picked = raw_input('Type a name for your new configuration: ') 
         save_config(args,filename_picked)
     return filename_picked,args
+
+def save_results(args,config_name):
+    with open('results\\' + config_name + '.json','w+') as jsonfile:
+        json.dump(args, jsonfile, indent=4, separators=(',', ': '), sort_keys=True)

@@ -1,0 +1,13 @@
+{
+    "password1": "MjzGww8yBd3n",
+    "password2": "so96crlnprnF",
+    "path": "C:\\Program Files (x86)\\Common Files\\MicroStrategy\\",
+    "port1": "34952",
+    "port2": "34952",
+    "project1": "Duplicated SMR Self Service",
+    "project2": "EDW",
+    "server1": "env-165258laiouse1",
+    "server2": "env-165263laiouse1",
+    "user1": "mstr",
+    "user2": "mstr"
+}

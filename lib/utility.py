@@ -204,19 +204,57 @@ def input_parameters():
     args={}
     input_texts=OrderedDict(
         [
-            ("path","Provide the Path Location: "),
+            ("path","Provide the Path where MicroStrategy is installed (Usually C:\\Program Files (x86)\\Common Files\\MicroStrategy\\) : "),
             ("server1", "Provide the Hostname for Server 1 : "),
             ("user1", "Provide the User for Server 1 : "),
             ("password1", "Provide the Password for Server 1 : "),
-            ("port1", "Provide the Port for Server 1 : "),
+            ("port1", "Provide the Port for Server 1 (Usually 34952) : "),
             ("project1", "Provide the Project for Server 1 : "),
             ("server2", "Provide the Hostname for Server 2 : "),
             ("user2", "Provide the User for Server 2 : "),
             ("password2", "Provide the Password for Server 2 : "),
-            ("port2", "Provide the Port for Server 2 : "),
+            ("port2", "Provide the Port for Server 2 (Usually 34952) : "),
             ("project2", "Provide the Project for Server 2 : ")
         ]
     )
     for element in input_texts:
         args[element]=raw_input(input_texts[element])
+        if element=="path" and args[element] == "":
+            args[element] = 'C:\\Program Files (x86)\\Common Files\\MicroStrategy\\'
+        elif (element=="port1" or element=="port2") and args[element] == "":
+            args[element] = "34952"
     return args
+
+def save_config(args,config_name):
+    with open('conf\\' + config_name + '.json','w+') as jsonfile:
+        json.dump(args, jsonfile, indent=4, separators=(',', ': '), sort_keys=True)
+
+def pick_config():
+    list_files={}
+    fnumber=1
+    args={}
+    picked=0
+    filename_picked=''
+    #print('The following configuration files where found :')
+    for root, dirs, files in os.walk("conf\\"):
+        for filename in files:
+            list_files[fnumber]=filename
+            fnumber=fnumber+1
+    if len(list_files) > 0:
+        print('The following configuration files were found: ')
+        for f in list_files:
+            print(str(f) + ' : ' + list_files[f])
+        try:
+            picked=int(raw_input('Select a file by typing the index (If you wish to create a new configuration, hit enter): '))
+            with open("conf\\"+list_files[picked]) as fparams:
+                args=json.load(fparams)
+            filename_picked=list_files[picked]
+        except:
+            args = utility.input_parameters()
+            filename_picked = raw_input('Type a name for your new configuration: ') 
+            save_config(args,filename_picked)
+    else:
+        args = utility.input_parameters()
+        filename_picked = raw_input('Type a name for your new configuration: ') 
+        save_config(args,filename_picked)
+    return filename_picked,args

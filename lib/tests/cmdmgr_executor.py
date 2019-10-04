@@ -54,7 +54,7 @@ class Executor:
             command = "cmdmgr -n \"" + self.server_name + \
                       "\" -u \"" + self.user_name + "\""
             if len(self.user_pwd) > 0:
-                command += " -p " + self.user_pwd
+                command += " -p \"" + self.user_pwd + "\""
             command += " -f \"" + scp_full_path + "\" -o \"" + output_full_path + "\""
         print command
         # Execute command

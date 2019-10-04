@@ -158,6 +158,7 @@ def compare_arrays(base_array, base_info, new_array, new_info):
         found = False
         row = row + 1
         elementdic[SettingDSAttr.ROWID.value] = row
+        elementdic[SettingDSAttr.LOCATION.value] = element[SettingAttr.LOCATION]
 
         elementdic[SettingDSAttr.NAME.value] = element[SettingAttr.NAME]
         elementdic[SettingDSAttr.LEVEL.value] = element[SettingAttr.LEVEL]
@@ -186,6 +187,7 @@ def compare_arrays(base_array, base_info, new_array, new_info):
     for element in base_array_copy:
         row = row + 1
         elementdic[SettingDSAttr.ROWID.value] = row
+        elementdic[SettingDSAttr.LOCATION.value] = element[SettingAttr.LOCATION]
 
         elementdic[SettingDSAttr.NAME.value] = element[SettingAttr.NAME]
         elementdic[SettingDSAttr.LEVEL.value] = element[SettingAttr.LEVEL]

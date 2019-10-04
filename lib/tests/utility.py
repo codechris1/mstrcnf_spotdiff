@@ -3,6 +3,7 @@ import sys
 import json
 import hashlib
 import copy
+from constaint import ServerAttr, SettingAttr, SettingDSAttr
 from collections import OrderedDict
 from cmdmgr_executor import Executor as cmdmgrExecutor
 from cfgwiz_executor import Executor as cfgwizExecutor
@@ -87,54 +88,54 @@ def rf_cmmgr(MSTRPath, server_name, user_name, user_pwd, port, project, source):
         row = {}
         raw=raw.replace('\n','')
         if '\t' in raw:
-            row['level']=raw.count('\t')
+            row[SettingAttr.LEVEL]=raw.count('\t')
         else:
-            row['level']=0
+            row[SettingAttr.LEVEL]=0
         raw=raw.replace('\t','')
-        row['setting_id']=setting_id
+        row[SettingAttr.ID]=setting_id
         if ' = ' in raw:
-            row['type']='value'
+            row[SettingAttr.TYPE]='value'
             setting=raw.split(' = ')
-            row['name']=setting[0]
-            row['value']=setting[1]
+            row[SettingAttr.NAME]=setting[0]
+            row[SettingAttr.VALUE]=setting[1]
         else:
-            row['type']='parent'
-            row['name']=raw
-            row['value']=''
-        row['source']=source
-        row['setting_id']=setting_id
+            row[SettingAttr.TYPE]='parent'
+            row[SettingAttr.NAME]=raw
+            row[SettingAttr.VALUE]=''
+        row[SettingAttr.SOURCE]=source
+        row[SettingAttr.ID]=setting_id
         setting_id=setting_id+1
-        if row['level']==0 and row['type']=='parent':
-            parent1=row['name']
-        if row['level']==1 and row['type']=='parent':
-            parent2=row['name']
-        if row['level']==0 and row['type']=='value':
-            row['parent1']=''
-            row['parent2']=''
-        elif row['level']==1 and row['type']=='value':
-            row['parent1']=parent1
-            row['parent2']=''
+        if row[SettingAttr.LEVEL]==0 and row[SettingAttr.TYPE]=='parent':
+            parent1=row[SettingAttr.NAME]
+        if row[SettingAttr.LEVEL]==1 and row[SettingAttr.TYPE]=='parent':
+            parent2=row[SettingAttr.NAME]
+        if row[SettingAttr.LEVEL]==0 and row[SettingAttr.TYPE]=='value':
+            row[SettingAttr.PARENTONE]=''
+            row[SettingAttr.PARENTTWO]=''
+        elif row[SettingAttr.LEVEL]==1 and row[SettingAttr.TYPE]=='value':
+            row[SettingAttr.PARENTONE]=parent1
+            row[SettingAttr.PARENTTWO]=''
         else:
-            row['parent1']=parent1
-            row['parent2']=parent2
-        if row['level']==2:
-            row['location']=row['parent1']+' > '+row['parent2']+' > '+row['name']
+            row[SettingAttr.PARENTONE]=parent1
+            row[SettingAttr.PARENTTWO]=parent2
+        if row[SettingAttr.LEVEL]==2:
+            row[SettingAttr.LOCATION]=row[SettingAttr.PARENTONE]+' > '+row[SettingAttr.PARENTTWO]+' > '+row[SettingAttr.NAME]
             #row['rawkey']=row['parent1']+' > '+row['parent2']+' > '+row['name'] + ' = ' + row['value']
-            row['rawkey']=row['parent1']+' > '+row['parent2']+' > '+row['name']
-        elif row['level']==1:
-            row['location']=row['parent1']+' > '+row['name']
+            row[SettingAttr.RAWKEY]=row[SettingAttr.PARENTONE]+' > '+row[SettingAttr.PARENTTWO]+' > '+row[SettingAttr.NAME]
+        elif row[SettingAttr.LEVEL]==1:
+            row[SettingAttr.LOCATION]= row[SettingAttr.PARENTONE]+' > '+row[SettingAttr.NAME]
             #row['rawkey']=row['parent1']+' > '+row['name'] + ' = ' + row['value']
-            row['rawkey']=row['parent1']+' > '+row['name']
+            row[SettingAttr.RAWKEY]=row[SettingAttr.PARENTONE]+' > '+row[SettingAttr.NAME]
         else:
-            row['location']=row['name']
+            row[SettingAttr.LOCATION]=row[SettingAttr.NAME]
             #row['rawkey']=row['name'] + ' = ' + row['value']
-            row['rawkey']=row['name']
-        hashedkey=hashlib.md5(row['rawkey'].encode())
-        row['hashkey']=hashedkey.hexdigest()
-        row['sn']=server_name
-        row['pr']=project
-        row['usr']=user_name
-        if row['type']=='value':
+            row[SettingAttr.RAWKEY]=row[SettingAttr.NAME]
+        hashedkey=hashlib.md5(row[SettingAttr.RAWKEY].encode())
+        row[SettingAttr.HASHKEY]=hashedkey.hexdigest()
+        #row['sn']=server_name
+        #row['pr']=project
+        #row['usr']=user_name
+        if row[SettingAttr.TYPE]=='value':
             format_output.append(row)
     return format_output
 
@@ -143,57 +144,57 @@ def compare_arrays(base_array, base_info, new_array, new_info):
     row = 0
     elementdic = {}
 
-    elementdic['sn1'] = base_info['sn']
-    elementdic['sn2'] = new_info['sn']
-    elementdic['pr1'] = base_info['pr']
-    elementdic['pr2'] = new_info['pr']
-    elementdic['source'] = base_info['sr']
-    elementdic['usr1'] = base_info['usr']
-    elementdic['usr2'] = new_info['usr']
+    elementdic[SettingDSAttr.SEVERNAMEONE.value] = base_info[ServerAttr.NAME]
+    elementdic[SettingDSAttr.SERVERNAMETWO.value] = new_info[ServerAttr.NAME]
+    elementdic[SettingDSAttr.PROJECTONE.value] = base_info[ServerAttr.PROJECT]
+    elementdic[SettingDSAttr.PROJECTTWO.value] = new_info[ServerAttr.PROJECT]
+    elementdic[SettingDSAttr.SOURCE.value] = base_info[ServerAttr.SOURCE]
+    elementdic[SettingDSAttr.USERONE.value] = base_info[ServerAttr.USER]
+    elementdic[SettingDSAttr.USERTWO.value] = new_info[ServerAttr.USER]
 
     base_array_copy = copy.copy(base_array)
 
     for element in new_array:
         found = False
         row = row + 1
-        elementdic['row'] = row
+        elementdic[SettingDSAttr.ROWID.value] = row
 
-        elementdic['setname'] = element['name']
-        elementdic['setlevel'] = element['level']
-        elementdic['parent1'] = element['parent1']
-        elementdic['parent2'] = element['parent2']
-        elementdic['val2'] = element['value']
+        elementdic[SettingDSAttr.NAME.value] = element[SettingAttr.NAME]
+        elementdic[SettingDSAttr.LEVEL.value] = element[SettingAttr.LEVEL]
+        elementdic[SettingDSAttr.PARENTONE.value] = element[SettingAttr.PARENTONE]
+        elementdic[SettingDSAttr.PARENTTWO.value] = element[SettingAttr.PARENTTWO]
+        elementdic[SettingDSAttr.VALUETWO.value] = element[SettingAttr.VALUE]
 
         for target in base_array_copy:
-            if element['hashkey'] == target['hashkey']:
+            if element[SettingAttr.HASHKEY] == target[SettingAttr.HASHKEY]:
                 found = True
-                elementdic['val1'] = target['value']
-                if element['value'] == target['value']:
-                    elementdic['diff'] = 0
+                elementdic[SettingDSAttr.VALUEONE.value] = target[SettingAttr.VALUE]
+                if element[SettingAttr.VALUE] == target[SettingAttr.VALUE]:
+                    elementdic[SettingDSAttr.DIFFERENCE.value] = 0
                 else:
-                    elementdic['diff'] = 1
+                    elementdic[SettingDSAttr.DIFFERENCE.value] = 1
                 
                 base_array_copy.remove(target)
                 break
         
         if not found :
-            elementdic['val1'] =''
-            elementdic['diff'] = 1
+            elementdic[SettingDSAttr.VALUEONE.value] =''
+            elementdic[SettingDSAttr.DIFFERENCE.value] = 1
         
         result.append(copy.copy(elementdic))
     
     for element in base_array_copy:
         row = row + 1
-        elementdic['row'] = row
+        elementdic[SettingDSAttr.ROWID.value] = row
 
-        elementdic['setname'] = element['name']
-        elementdic['setlevel'] = element['level']
-        elementdic['parent1'] = element['parent1']
-        elementdic['parent2'] = element['parent2']
+        elementdic[SettingDSAttr.NAME.value] = element[SettingAttr.NAME]
+        elementdic[SettingDSAttr.LEVEL.value] = element[SettingAttr.LEVEL]
+        elementdic[SettingDSAttr.PARENTONE.value] = element[SettingAttr.PARENTONE]
+        elementdic[SettingAttr.PARENTTWO.value] = element[SettingAttr.PARENTTWO]
 
-        elementdic['val1'] = element['value']
-        elementdic['val2'] = ''
-        elementdic['diff'] = 1
+        elementdic[SettingDSAttr.VALUEONE.value] = element[SettingAttr.VALUE]
+        elementdic[SettingDSAttr.VALUETWO.value] = ''
+        elementdic[SettingDSAttr.DIFFERENCE.value] = 1
 
         result.append(copy.copy(elementdic))
 

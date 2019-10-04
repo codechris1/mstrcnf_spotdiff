@@ -180,8 +180,8 @@ def compare_arrays(base_array, base_info, new_array, new_info):
                 else:
                     
                     for target1 in base_array_copy:
-                        if element[SettingAttr.VALUE] == target[SettingAttr.VALUE]:
-                            if element[SettingAttr.HASHKEY] == target[SettingAttr.HASHKEY]:
+                        if element[SettingAttr.VALUE] == target1[SettingAttr.VALUE]:
+                            if element[SettingAttr.HASHKEY] == target1[SettingAttr.HASHKEY]:
                                 elementdic[SettingDSAttr.DIFFERENCE.value] = 0
                                 target = target1
                                 break

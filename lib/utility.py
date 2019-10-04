@@ -178,6 +178,14 @@ def compare_arrays(base_array, base_info, new_array, new_info):
                 if element[SettingAttr.VALUE] == target[SettingAttr.VALUE]:
                     elementdic[SettingDSAttr.DIFFERENCE.value] = 0
                 else:
+                    
+                    for target1 in base_array_copy:
+                        if element[SettingAttr.VALUE] == target[SettingAttr.VALUE]:
+                            if element[SettingAttr.HASHKEY] == target[SettingAttr.HASHKEY]:
+                                elementdic[SettingDSAttr.DIFFERENCE.value] = 0
+                                target = target1
+                                break
+
                     elementdic[SettingDSAttr.DIFFERENCE.value] = 1
                 
                 base_array_copy.remove(target)

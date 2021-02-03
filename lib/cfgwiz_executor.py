@@ -1,12 +1,4 @@
 #!/usr/bin/env python
-#
-# This class calls configuration wizard and executes scripts on it
-# --------------------------------------------------------------
-# Author: Luis Carrillo
-# --------------------------------------------------------------
-# sample calling:
-#        executor = Executor(args[1], isWin)
-#        output = executor.run_cfgwiz(script)
 
 import os
 import subprocess

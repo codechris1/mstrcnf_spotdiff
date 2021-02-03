@@ -1,15 +1,4 @@
 #!/usr/bin/env python
-#
-# This class calls configuration wizard and executes scripts on it
-# --------------------------------------------------------------
-# Author: Luis Carrillo
-# Updated: Jikai Tang - change run_validation logic
-# Date: 11/2/2016
-# Updated for LinuxMstrBak : Martin Bonica
-# --------------------------------------------------------------
-# sample calling:
-#        executor = Executor(args[1], isWin)
-#        output = executor.run_cfgwiz(script)
 
 import os
 import time

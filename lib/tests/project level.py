@@ -4,12 +4,12 @@ import json
 
 
 MSTRPath = 'C:\\Program Files (x86)\\Common Files\\MicroStrategy\\'
-#server_name = 'env-165136-tcp.customer.cloud.microstrategy.com'
-server_name = 'ENV-165136LAIOUSE1'
-user_name = 'Administrator'
-user_pwd = 'mYJ80QKa2hbu'
+#server_name = ''
+server_name = ''
+user_name = ''
+user_pwd = ''
 port = '34952'
-project = 'MicroStrategy Tutorial'
+project = ''
 
 utility.create_project_source(MSTRPath,server_name,port,user_name,user_pwd)
 
